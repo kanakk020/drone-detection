@@ -151,6 +151,9 @@ def draw_hud(frame, fps, telem, n_dets, alerts):
 def detection_loop():
     model = YOLO("yolov8n.pt")
     cap = cv2.VideoCapture(CONFIG["video_source"])
+    if not cap.isOpened():
+        print("[WARN] No camera found. Detection loop idle.")
+        return
 
     os.makedirs(CONFIG["output_dir"], exist_ok=True)
     alert_log_path = os.path.join(
