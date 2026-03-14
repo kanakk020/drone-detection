@@ -1,0 +1,189 @@
+[
+  {
+    "timestamp": "2026-03-14T20:47:36.984185",
+    "class": "person",
+    "confidence": 0.896,
+    "distance_m": 2.1,
+    "gps": {
+      "lat": 28.613421,
+      "lon": 77.208857,
+      "alt": 54.1
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:47:39.090626",
+    "class": "person",
+    "confidence": 0.861,
+    "distance_m": 2.1,
+    "gps": {
+      "lat": 28.613413,
+      "lon": 77.208887,
+      "alt": 53.4
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:47:41.237963",
+    "class": "person",
+    "confidence": 0.895,
+    "distance_m": 2.3,
+    "gps": {
+      "lat": 28.613407,
+      "lon": 77.208919,
+      "alt": 52.6
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:47:43.354076",
+    "class": "person",
+    "confidence": 0.898,
+    "distance_m": 2.3,
+    "gps": {
+      "lat": 28.613402,
+      "lon": 77.20895,
+      "alt": 51.6
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:47:45.440804",
+    "class": "person",
+    "confidence": 0.928,
+    "distance_m": 2.3,
+    "gps": {
+      "lat": 28.6134,
+      "lon": 77.208982,
+      "alt": 50.6
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:47:47.527500",
+    "class": "person",
+    "confidence": 0.904,
+    "distance_m": 2.2,
+    "gps": {
+      "lat": 28.6134,
+      "lon": 77.209013,
+      "alt": 49.6
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:47:49.671906",
+    "class": "person",
+    "confidence": 0.875,
+    "distance_m": 2.2,
+    "gps": {
+      "lat": 28.613402,
+      "lon": 77.209045,
+      "alt": 48.5
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:47:51.787335",
+    "class": "person",
+    "confidence": 0.903,
+    "distance_m": 2.1,
+    "gps": {
+      "lat": 28.613406,
+      "lon": 77.209077,
+      "alt": 47.5
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:47:53.876833",
+    "class": "person",
+    "confidence": 0.847,
+    "distance_m": 2.2,
+    "gps": {
+      "lat": 28.613412,
+      "lon": 77.209107,
+      "alt": 46.7
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:47:56.000775",
+    "class": "person",
+    "confidence": 0.871,
+    "distance_m": 1.9,
+    "gps": {
+      "lat": 28.613419,
+      "lon": 77.209138,
+      "alt": 46.0
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:47:58.117755",
+    "class": "person",
+    "confidence": 0.864,
+    "distance_m": 2.0,
+    "gps": {
+      "lat": 28.613429,
+      "lon": 77.209168,
+      "alt": 45.4
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:48:00.247833",
+    "class": "person",
+    "confidence": 0.902,
+    "distance_m": 2.0,
+    "gps": {
+      "lat": 28.613441,
+      "lon": 77.209198,
+      "alt": 45.1
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:48:02.284266",
+    "class": "person",
+    "confidence": 0.906,
+    "distance_m": 2.0,
+    "gps": {
+      "lat": 28.613454,
+      "lon": 77.209226,
+      "alt": 45.0
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:48:04.428834",
+    "class": "person",
+    "confidence": 0.854,
+    "distance_m": 2.0,
+    "gps": {
+      "lat": 28.613469,
+      "lon": 77.209254,
+      "alt": 45.1
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:48:06.592994",
+    "class": "person",
+    "confidence": 0.867,
+    "distance_m": 2.0,
+    "gps": {
+      "lat": 28.613487,
+      "lon": 77.209281,
+      "alt": 45.4
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:48:08.731006",
+    "class": "person",
+    "confidence": 0.868,
+    "distance_m": 2.0,
+    "gps": {
+      "lat": 28.613506,
+      "lon": 77.209307,
+      "alt": 46.0
+    }
+  },
+  {
+    "timestamp": "2026-03-14T20:48:10.812857",
+    "class": "person",
+    "confidence": 0.878,
+    "distance_m": 2.0,
+    "gps": {
+      "lat": 28.613526,
+      "lon": 77.209331,
+      "alt": 46.7
+    }
+  }
+]
