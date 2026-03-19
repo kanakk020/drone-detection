@@ -5,229 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>AI Drone Vision</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&display=swap');
-
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-
-:root{
-  --bg0:#060c0b;--bg1:#0d1a17;--bg2:#132420;--bg3:#1a2e2a;
-  --g:#00e87a;--gd:rgba(0,232,122,0.1);--gb:rgba(0,232,122,0.25);
-  --r:#ff3c3c;--rd:rgba(255,60,60,0.1);
-  --y:#ffd24a;--yd:rgba(255,210,74,0.1);
-  --b:#38beff;--bd:rgba(56,190,255,0.1);
-  --or:#ff9a38;--ord:rgba(255,154,56,0.1);
-  --t1:#d4ffe8;--t2:rgba(212,255,232,0.55);--t3:rgba(212,255,232,0.28);
-  --border:rgba(0,232,122,0.18);--border2:rgba(0,232,122,0.08);
-  --mono:'Share Tech Mono',monospace;--sans:'Rajdhani',sans-serif;
-  --r3:3px;--r6:6px;
-}
-
-html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:var(--mono);font-size:12px;overflow:hidden}
-
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar{width:3px;height:3px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--gb);border-radius:2px}
-
-/* ── TOPBAR ── */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--bg1);border-bottom:1px solid var(--border);
-  padding:0 14px;height:46px;flex-shrink:0;z-index:200;position:relative;
-}
-.brand{font-family:var(--sans);font-weight:700;font-size:20px;letter-spacing:3px;color:var(--t1)}
-.brand em{color:var(--g);font-style:normal}
-.top-right{display:flex;align-items:center;gap:10px}
-.chip{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--t2);letter-spacing:.5px;white-space:nowrap}
-.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.dot-g{background:var(--g);box-shadow:0 0 5px var(--g)}
-.dot-r{background:var(--r)}
-#clock{font-family:var(--sans);font-weight:700;font-size:15px;color:var(--g);letter-spacing:1px;min-width:64px;text-align:right}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.rec-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--r);
-  box-shadow:0 0 4px var(--r);animation:blink 1s step-end infinite;margin-right:3px}
-
-/* Alerts button */
-.alerts-btn{
-  display:flex;align-items:center;gap:5px;
-  background:var(--rd);border:1px solid rgba(255,60,60,0.3);
-  color:var(--r);font-family:var(--mono);font-size:9px;letter-spacing:.5px;
-  padding:5px 10px;border-radius:var(--r3);cursor:pointer;white-space:nowrap;
-  transition:background .2s;
-}
-.alerts-btn:hover{background:rgba(255,60,60,0.18)}
-.alerts-btn .count{font-family:var(--sans);font-weight:700;font-size:12px}
-
-/* ── NAV TABS (mobile) ── */
-.nav{
-  display:none;background:var(--bg1);border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.nav button{
-  flex:1;height:44px;background:none;border:none;border-bottom:2px solid transparent;
-  color:var(--t3);font-family:var(--mono);font-size:9px;letter-spacing:.5px;
-  cursor:pointer;transition:all .2s;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:2px;padding:0;
-}
-.nav button .ni{font-size:14px;line-height:1}
-.nav button .nl{font-size:8px}
-.nav button.active{color:var(--g);border-bottom-color:var(--g)}
-
-/* ── LAYOUT ── */
-.layout{
-  display:grid;grid-template-columns:210px 1fr 230px;
-  height:calc(100vh - 46px - 30px);gap:1px;background:var(--border2);
-}
-.col{background:var(--bg0);overflow:hidden;display:flex;flex-direction:column}
-
-/* ── SECTION TITLE ── */
-.sec{font-size:8px;letter-spacing:2px;color:var(--t3);padding:10px 12px 6px;
-  border-bottom:1px solid var(--border2);flex-shrink:0;font-family:var(--mono)}
-
-/* ── SCROLLABLE CONTENT ── */
-.scroll{overflow-y:auto;flex:1;padding:10px 12px}
-
-/* ── STAT CARDS ── */
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
-.sc{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r6);padding:10px 10px 8px}
-.sc .v{font-family:var(--sans);font-size:24px;font-weight:700;line-height:1;margin-bottom:2px}
-.sc .l{font-size:8px;color:var(--t3);letter-spacing:1px}
-.sc.wide{grid-column:span 2}
-
-/* ── DETECTION CARDS ── */
-.dcard{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r6);
-  padding:10px;margin-bottom:8px;transition:border-color .15s}
-.dcard:hover{border-color:var(--gb)}
-.dcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.dcard-cls{font-family:var(--sans);font-weight:700;font-size:14px}
-.badge{font-size:8px;padding:2px 8px;border-radius:var(--r3);letter-spacing:.5px;border:1px solid;font-family:var(--mono)}
-.b-r{background:var(--rd);color:var(--r);border-color:rgba(255,60,60,0.25)}
-.b-or{background:var(--ord);color:var(--or);border-color:rgba(255,154,56,0.25)}
-.b-y{background:var(--yd);color:var(--y);border-color:rgba(255,210,74,0.25)}
-.b-g{background:var(--gd);color:var(--g);border-color:rgba(0,232,122,0.25)}
-.cbar-bg{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-bottom:6px;overflow:hidden}
-.cbar{height:3px;border-radius:2px;transition:width .35s ease}
-.dmeta{font-size:9px;color:var(--t3);display:flex;gap:8px;flex-wrap:wrap}
-.no-det{color:var(--t3);font-size:10px;text-align:center;padding:24px 0}
-
-/* ── FEED COL ── */
-.feed-col{position:relative}
-.feed-wrap{width:100%;height:100%;position:relative;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center}
-.feed-wrap img{width:100%;height:100%;object-fit:contain;display:block}
-/* Corner brackets */
-.fc{position:absolute;width:20px;height:20px;border-color:rgba(0,232,122,0.55);border-style:solid;pointer-events:none}
-.fc.tl{top:12px;left:12px;border-width:2px 0 0 2px}
-.fc.tr{top:12px;right:12px;border-width:2px 2px 0 0}
-.fc.bl{bottom:12px;left:12px;border-width:0 0 2px 2px}
-.fc.br{bottom:12px;right:12px;border-width:0 2px 2px 0}
-.zone-label{position:absolute;top:16px;left:50%;transform:translateX(-50%);
-  font-size:8px;color:rgba(0,200,255,0.45);letter-spacing:2px;pointer-events:none}
-/* Snapshot */
-#snap-btn{
-  position:absolute;bottom:14px;right:14px;z-index:10;
-  background:rgba(6,12,11,0.8);border:1px solid var(--gb);
-  color:var(--g);font-family:var(--mono);font-size:9px;letter-spacing:1px;
-  padding:8px 14px;border-radius:var(--r3);cursor:pointer;
-  transition:all .15s;backdrop-filter:blur(6px);display:flex;align-items:center;gap:6px;
-}
-#snap-btn:hover{background:rgba(0,232,122,0.12)}
-#snap-btn:active{transform:scale(0.96)}
-#snap-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .07s;z-index:9}
-#snap-toast{
-  position:absolute;bottom:52px;right:14px;z-index:11;
-  background:rgba(0,232,122,0.12);border:1px solid var(--gb);
-  color:var(--g);font-family:var(--mono);font-size:9px;letter-spacing:.5px;
-  padding:6px 12px;border-radius:var(--r3);opacity:0;transition:opacity .3s;pointer-events:none;
-}
-
-/* ── RIGHT COL ── */
-.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:0}
-.tc{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r6);padding:8px 9px}
-.tc .tv{font-family:var(--sans);font-size:16px;font-weight:700;line-height:1.1;margin-bottom:1px}
-.tc .tl{font-size:8px;color:var(--t3);letter-spacing:1px}
-.map-wrap{flex:1;position:relative;border-top:1px solid var(--border2);min-height:160px}
-#map{width:100%;height:100%}
-.leaflet-tile{filter:invert(1) hue-rotate(180deg) brightness(0.65) contrast(1.1) saturate(0.5)}
-.leaflet-container{background:var(--bg0)!important}
-.leaflet-control-zoom a{background:var(--bg2)!important;color:var(--g)!important;border-color:var(--border)!important;font-size:14px!important}
-.leaflet-control-attribution{background:rgba(6,12,11,0.85)!important;color:var(--t3)!important;font-size:7px!important}
-#gps-badge{position:absolute;top:8px;right:8px;z-index:500;font-size:8px;padding:3px 8px;border-radius:var(--r3);border:1px solid;font-family:var(--mono);letter-spacing:.5px}
-
-/* ── ALERTS PANEL (slide-in) ── */
-.alerts-panel{
-  position:fixed;top:46px;right:0;width:340px;
-  height:calc(100vh - 46px - 30px);
-  background:var(--bg1);border-left:1px solid var(--border);
-  z-index:300;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);
-  display:flex;flex-direction:column;
-}
-.alerts-panel.open{transform:translateX(0)}
-.ap-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;
-  border-bottom:1px solid var(--border2);flex-shrink:0}
-.ap-title{font-size:9px;letter-spacing:2px;color:var(--t3)}
-.ap-close{background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;
-  line-height:1;padding:0 2px;transition:color .15s}
-.ap-close:hover{color:var(--t1)}
-.ap-body{overflow-y:auto;flex:1;padding:10px 14px}
-.alert-row{display:flex;align-items:center;gap:8px;padding:8px 0;
-  border-bottom:1px solid var(--border2)}
-.alert-row:last-child{border:none}
-.ar-time{font-size:9px;color:var(--t3);min-width:54px}
-.ar-cls{font-family:var(--sans);font-weight:700;font-size:13px;min-width:60px}
-.ar-meta{font-size:9px;color:var(--t2);display:flex;flex-direction:column;gap:2px;flex:1}
-.no-alerts{color:var(--t3);font-size:10px;text-align:center;padding:30px 0}
-
-/* ── BOTTOM BAR ── */
-.bot{height:30px;background:var(--bg1);border-top:1px solid var(--border);
-  display:flex;align-items:center;padding:0 14px;gap:8px;font-size:8px;color:var(--t3);
-  letter-spacing:.5px;flex-shrink:0;overflow:hidden}
-.btag{padding:1px 7px;border-radius:2px;font-size:8px;letter-spacing:.5px;border:1px solid;white-space:nowrap}
-.bt-g{background:var(--gd);color:var(--g);border-color:rgba(0,232,122,0.25)}
-.bt-b{background:var(--bd);color:var(--b);border-color:rgba(56,190,255,0.25)}
-.bt-r{background:var(--rd);color:var(--r);border-color:rgba(255,60,60,0.25)}
-.bt-y{background:var(--yd);color:var(--y);border-color:rgba(255,210,74,0.25)}
-
-/* ── MOBILE ── */
-@media(max-width:768px){
-  html,body{overflow:auto}
-  .topbar{height:50px;padding:0 12px}
-  .brand{font-size:17px}
-  #clock{font-size:13px;min-width:56px}
-  .chip.hm{display:none}
-
-  .nav{display:flex}
-
-  .layout{
-    display:flex;flex-direction:column;height:auto;gap:0;background:var(--bg0);
-  }
-  .col{display:none;flex-direction:column}
-  .col.show{display:flex}
-
-  /* Feed tab */
-  #col-feed{height:calc(100vw * 0.75);min-height:240px;max-height:380px}
-
-  /* Detections tab */
-  #col-det .scroll{max-height:calc(100vh - 50px - 44px - 30px);overflow-y:auto}
-
-  /* Map tab */
-  #col-map .tgrid{grid-template-columns:1fr 1fr 1fr}
-  .map-wrap{min-height:300px;flex:none;height:300px}
-
-  /* Alerts panel full screen on mobile */
-  .alerts-panel{width:100%;top:94px;height:calc(100vh - 94px - 30px)}
-
-  .bot{padding:0 10px;gap:6px}
-  .btag{display:none}
-  #bot-dets{display:block!important}
-}
-
-@media(max-width:420px){
-  #col-feed{height:calc(100vw * 0.85)}
-  .tgrid{grid-template-columns:1fr 1fr!important}
-  .tc .tv{font-size:13px}
-}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
@@ -289,19 +67,27 @@ html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:var(--mo
   </div>
 
   <!-- CENTER: VIDEO FEED -->
-  <div class="col feed-col show" id="col-feed">
-    <div class="feed-wrap">
-      <img id="vfeed" src="/video_feed" alt="feed"/>
-      <div class="fc tl"></div><div class="fc tr"></div>
-      <div class="fc bl"></div><div class="fc br"></div>
-      <div class="zone-label">◄ LOCK ZONE ►</div>
-      <button id="snap-btn" onclick="doSnap()">
-        <span>📷</span><span>SNAPSHOT</span>
-      </button>
-      <div id="snap-flash"></div>
-      <div id="snap-toast">✓ SAVED</div>
-    </div>
+<div class="col feed-col show" id="col-feed">
+  <div class="feed-wrap">
+    <img id="vfeed" src="/video_feed" alt="feed"/>
+    <div class="fc tl"></div><div class="fc tr"></div>
+    <div class="fc bl"></div><div class="fc br"></div>
+    <div class="zone-label">◄ LOCK ZONE ►</div>
+
+    <!-- 📷 SNAPSHOT BUTTON -->
+    <button id="snap-btn" onclick="doSnap()">
+      <span>📷</span><span>SNAPSHOT</span>
+    </button>
+
+    <!-- 🎥 CAMERA TOGGLE BUTTON -->
+    <button id="cam-toggle" onclick="toggleCamera()">
+      <span>🎥</span><span>CAM OFF</span>
+    </button>
+
+    <div id="snap-flash"></div>
+    <div id="snap-toast">✓ SAVED</div>
   </div>
+</div>
 
   <!-- RIGHT: TELEMETRY + MAP -->
   <div class="col" id="col-map">
@@ -596,6 +382,26 @@ async function pollAlerts(){
 setInterval(pollDets,500);
 setInterval(pollAlerts,2000);
 pollDets();pollAlerts();
+
+async function toggleCamera(){
+  try{
+    const res = await fetch('/toggle_camera', { method: 'POST' });
+    const data = await res.json();
+
+    const btn = document.getElementById("cam-toggle");
+
+    if(data.camera_on){
+      btn.innerHTML = "<span>🎥</span><span>CAM OFF</span>";
+      btn.classList.remove("off");
+    } else {
+      btn.innerHTML = "<span>⛔</span><span>CAM ON</span>";
+      btn.classList.add("off");
+    }
+
+  }catch(e){
+    console.error("Camera toggle failed", e);
+  }
+}
 </script>
 </body>
 </html>
