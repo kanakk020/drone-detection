@@ -1,7 +1,3 @@
-# ==========================================================
-# AI Drone Vision — FINAL FIXED VERSION 🚀
-# ==========================================================
-
 import math
 import time
 import threading
@@ -14,20 +10,20 @@ import io
 
 app = Flask(__name__)
 
-# ---------------- CONFIG ----------------
+# Basic configuration for video + detection
 CONFIG = {
-    "video_source": 0,
-    "confidence_thresh": 0.55,
-    "frame_size": (640, 480),
+    "video_source": 0,              # default webcam
+    "confidence_thresh": 0.55,     # minimum confidence to show detection
+    "frame_size": (640, 480),      # resize frames for performance
     "output_dir": "output",
-    "jpeg_quality": 60,
-    "skip_frames": 3,
+    "jpeg_quality": 60,            # compression for streaming
+    "skip_frames": 3,              # skip frames to reduce load
 }
 
 RUN_DETECTION = True
 CAMERA_ON = True
 
-# ---------------- STATE ----------------
+# Shared state between threads
 state = {
     "frame": None,
     "detections": [],
@@ -37,7 +33,7 @@ state = {
     "lock": threading.Lock(),
 }
 
-# ---------------- TELEMETRY ----------------
+# Fake telemetry to simulate drone data
 def get_simulated_telemetry():
     t = time.time()
     return {
@@ -49,13 +45,13 @@ def get_simulated_telemetry():
         "battery": max(20, 100 - int((t % 120) / 1.2)),
     }
 
-# ---------------- DETECTION LOOP ----------------
+# Runs continuously in background to capture frames + detect objects
 def detection_loop():
     global CAMERA_ON
 
     model = YOLO("yolov8n.pt")
 
-    # 🔥 FIX camera issue (Windows)
+    # Using DirectShow backend to avoid camera issues on Windows
     cap = cv2.VideoCapture(CONFIG["video_source"], cv2.CAP_DSHOW)
 
     if not cap.isOpened():
@@ -69,7 +65,7 @@ def detection_loop():
 
     while True:
 
-        # 🔥 CAMERA OFF MODE (FIXED)
+        # If camera is turned off, just reset values and wait
         if not CAMERA_ON:
             with state["lock"]:
                 state["detections"] = []
@@ -85,18 +81,19 @@ def detection_loop():
         frame = cv2.resize(frame, CONFIG["frame_size"])
         frame_count += 1
 
-        # 🔥 SKIP FRAMES
+        # Skip some frames to keep performance smooth
         if frame_count % CONFIG["skip_frames"] != 0:
             continue
 
         detections = []
 
-        # 🔥 YOLO DETECTION
+        # Run YOLO detection if enabled
         if RUN_DETECTION:
             results = model(frame, imgsz=320, verbose=False)
 
             for box in results[0].boxes:
                 conf = float(box.conf[0])
+
                 if conf < CONFIG["confidence_thresh"]:
                     continue
 
@@ -111,38 +108,38 @@ def detection_loop():
                     "in_center": False
                 })
 
-                # Draw box
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0,255,0), 2)
-                cv2.putText(frame, label, (x1, y1-5),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1)
+                # Draw bounding box + label
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(frame, label, (x1, y1 - 5),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
-        # FPS
+        # Calculate FPS
         curr_time = time.time()
-        fps = 1/(curr_time-prev_time) if prev_time else 0
+        fps = 1 / (curr_time - prev_time) if prev_time else 0
         prev_time = curr_time
 
-        # Encode frame
+        # Encode frame for streaming
         _, jpeg = cv2.imencode(".jpg", frame,
                                [cv2.IMWRITE_JPEG_QUALITY, CONFIG["jpeg_quality"]])
 
-        # Update shared state
+        # Update shared data safely
         with state["lock"]:
             state["frame"] = jpeg.tobytes()
             state["detections"] = detections
             state["fps"] = int(fps)
             state["telemetry"] = get_simulated_telemetry()
 
-# ---------------- STREAM ----------------
+# Generator that streams frames to browser
 def generate_frames():
     while True:
         with state["lock"]:
             frame = state["frame"]
 
-        # 🔥 CAMERA OFF SCREEN
+        # Show blank screen if camera is off
         if not CAMERA_ON:
             blank = np.zeros((480, 640, 3), dtype=np.uint8)
-            cv2.putText(blank, "CAMERA OFF", (180,240),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+            cv2.putText(blank, "CAMERA OFF", (180, 240),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
             _, jpeg = cv2.imencode(".jpg", blank)
             frame = jpeg.tobytes()
 
@@ -155,7 +152,8 @@ def generate_frames():
 
         time.sleep(0.06)
 
-# ---------------- ROUTES ----------------
+# ---------------- Routes ----------------
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -165,12 +163,14 @@ def video_feed():
     return Response(generate_frames(),
                     mimetype="multipart/x-mixed-replace; boundary=frame")
 
+# Toggle camera ON/OFF from frontend
 @app.route("/toggle_camera", methods=["POST"])
 def toggle_camera():
     global CAMERA_ON
     CAMERA_ON = not CAMERA_ON
     return jsonify({"camera_on": CAMERA_ON})
 
+# Returns current detections + FPS
 @app.route("/api/detections")
 def api_detections():
     with state["lock"]:
@@ -180,11 +180,13 @@ def api_detections():
             "total_dets": len(state["detections"]),
         })
 
+# Returns simulated telemetry data
 @app.route("/api/telemetry")
 def api_telemetry():
     with state["lock"]:
         return jsonify(state["telemetry"])
 
+# Capture current frame as image
 @app.route("/snapshot")
 def snapshot():
     with state["lock"]:
@@ -198,7 +200,7 @@ def snapshot():
                      as_attachment=True,
                      download_name="snapshot.jpg")
 
-# ---------------- MAIN ----------------
+# Start detection thread + Flask server
 if __name__ == "__main__":
     threading.Thread(target=detection_loop, daemon=True).start()
     print("🔥 Running → http://localhost:5000")
